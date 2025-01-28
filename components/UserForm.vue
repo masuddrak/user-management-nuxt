@@ -1,0 +1,115 @@
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import BaseInput from "@/components/base/BaseInput.vue";
+import BaseSelect from "@/components/base/BaseSelect.vue";
+import BaseRadio from "@/components/base/BaseRadio.vue";
+import BaseCheckbox from "@/components/base/BaseCheckbox.vue";
+import ConfirmationModal from "./base/ConfirmationModal.vue";
+import { useUserStore } from "@/stores/userStore";
+import Button from "./sheard/Button.vue";
+
+const userStore = useUserStore();
+
+const props = defineProps<{ initialData?: any }>();
+const emit = defineEmits(["submit", "cancel"]);
+
+// Initialize form with initial data or empty values
+const form = ref({
+  id: props.initialData?.id || "",
+  name: props.initialData?.name || "",
+  email: props.initialData?.email || "",
+  gender: props.initialData?.gender || "",
+  married: props.initialData?.married ?? false,
+  role: props.initialData?.role || "",
+});
+
+// Track changes
+const isChanged = computed(
+  () => JSON.stringify(form.value) !== JSON.stringify(props.initialData)
+);
+const showModal = ref(false);
+
+// Reset form
+watch(
+  () => props.initialData,
+  (newData) => {
+    form.value = { ...newData };
+  },
+  { deep: true }
+);
+
+// Handle form submission
+const handleSubmit = () => {
+  if (form.value.id) {
+    userStore.updateUser(form.value);
+  } else {
+    userStore.addUser(form.value);
+  }
+  emit("submit", form.value);
+};
+
+// Handle cancel action
+const handleCancel = () => {
+  if (isChanged.value) {
+    showModal.value = true;
+  } else {
+    resetForm();
+  }
+};
+
+// Reset form fields to initial state
+const resetForm = () => {
+  form.value = {
+    id: props.initialData?.id || "",
+    name: props.initialData?.name || "",
+    email: props.initialData?.email || "",
+    gender: props.initialData?.gender || "",
+    married: props.initialData?.married ?? false,
+    role: props.initialData?.role || "",
+  };
+  emit("cancel");
+  showModal.value = false;
+};
+</script>
+
+<template>
+  <form @submit.prevent="handleSubmit" class="w-full md:w-[500px] md:mx-auto">
+    <BaseInput
+      v-model="form.name"
+      label="Name"
+      name="name"
+      placeholder="Enter name"
+    />
+    <BaseInput
+      v-model="form.email"
+      label="Email"
+      name="email"
+      placeholder="Enter email"
+    />
+    <BaseRadio
+      v-model="form.gender"
+      label="Gender"
+      name="gender"
+      :options="['Male', 'Female', 'Others']"
+    />
+    <BaseCheckbox v-model="form.married" label="Married" name="married" />
+    <BaseSelect
+      v-model="form.role"
+      label="Role"
+      name="role"
+      :options="['Admin', 'User']"
+      placeholder="Select a role"
+    />
+
+    <div class="flex gap-3 mt-5">
+      <Button v-if="isChanged" type="submit" variant="submit"> Submit </Button>
+      <Button @click.prevent="handleCancel" variant="cancel"> Cancel </Button>
+    </div>
+  </form>
+
+  <ConfirmationModal
+    v-if="showModal"
+    @confirm="resetForm"
+    @close="showModal = false"
+  />
+</template>
