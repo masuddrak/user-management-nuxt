@@ -5,7 +5,7 @@ import Header from "~/components/sheard/Header.vue";
 <template>
   <div>
     <Header></Header>
-    <div class="container mx-auto">
+    <div class="mx-2 md:container md:mx-auto">
       <slot />
     </div>
   </div>

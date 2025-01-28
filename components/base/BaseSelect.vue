@@ -5,6 +5,7 @@
       :id="name"
       :name="name"
       :value="modelValue"
+      required
       @change="
         $emit('update:modelValue', ($event.target as HTMLSelectElement).value)
       "

@@ -1,6 +1,6 @@
 <template>
   <button
-    class="px-3 py-1 rounded-md text-white bg-green-700"
+    class="px-3 py-1 rounded-md text-white bg-gray-700"
     :class="variant == 'cancel' ? 'bg-red-500' : ''"
   >
     <slot />

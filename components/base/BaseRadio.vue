@@ -8,6 +8,7 @@
           :name="name"
           :value="option"
           :checked="modelValue === option"
+          required
           @change="$emit('update:modelValue', option)"
         />
         {{ option }}
