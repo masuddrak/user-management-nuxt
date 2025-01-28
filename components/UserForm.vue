@@ -22,13 +22,15 @@ const form = ref({
   married: props.initialData?.married ?? false,
   role: props.initialData?.role || "",
 });
-
+const showModal = ref(false);
 // Track changes
 const isChanged = computed(
   () => JSON.stringify(form.value) !== JSON.stringify(props.initialData)
 );
-const showModal = ref(false);
 
+const isAnyValueTrue = computed(() =>
+  Object.values(form.value).some((value) => Boolean(value))
+);
 // Reset form
 watch(
   () => props.initialData,
@@ -101,7 +103,10 @@ const resetForm = () => {
       placeholder="Select a role"
     />
 
-    <div class="flex gap-3 mt-5">
+    <div
+      class="flex gap-3 mt-5"
+      :class="isAnyValueTrue ? 'flex block' : 'hidden'"
+    >
       <Button v-if="isChanged" type="submit" variant="submit"> Submit </Button>
       <Button @click.prevent="handleCancel" variant="cancel"> Cancel </Button>
     </div>

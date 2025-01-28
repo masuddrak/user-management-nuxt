@@ -10,7 +10,7 @@
             Create New User Now!!!!!!!!!!
           </h1>
 
-          <Button :variant="submit"
+          <Button variant="submit"
             ><NuxtLink to="/users/create">Create User</NuxtLink></Button
           >
         </div>
