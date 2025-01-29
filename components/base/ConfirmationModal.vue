@@ -21,7 +21,7 @@ onMounted(() => {
       v-if="updateModal"
       class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50"
     >
-      <div class="bg-white p-8 rounded-md">
+      <div class="bg-white p-3 md:p-8 rounded-md min-w-[330px]">
         <h1 class="text-xl md:text-2xl font-bold text-center">Create User</h1>
         <UserForm updateModalCon="updateModal"></UserForm>
       </div>

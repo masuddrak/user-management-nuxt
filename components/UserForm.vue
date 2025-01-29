@@ -8,24 +8,25 @@ import ConfirmationModal from "./base/ConfirmationModal.vue";
 import { useUserStore } from "@/stores/userStore";
 import Button from "./sheard/Button.vue";
 
+const props = defineProps<{ initialData?: any; updateModalCon?: any }>();
 const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
-const props = defineProps<{ initialData?: any; updateModalCon?: any }>();
 const emit = defineEmits(["submit", "cancel"]);
-
-// Initialize form with initial data or empty values
-const form = ref({
+const initialForm = {
   id: props.initialData?.id || "",
   name: props.initialData?.name || "",
   email: props.initialData?.email || "",
   gender: props.initialData?.gender || "",
   married: props.initialData?.married ?? false,
   role: props.initialData?.role || "",
-});
+};
+// Initialize form with initial data or empty values
+const form = ref({ ...initialForm });
 const showModal = ref(false);
 const updateModal = ref(false);
 const newModalValue = ref(false);
+
 // Track changes
 const isChanged = computed(
   () => JSON.stringify(form.value) !== JSON.stringify(props.initialData)
@@ -78,14 +79,7 @@ const handleCancelModal = () => {
 
 // Reset form fields to initial state
 const resetForm = () => {
-  form.value = {
-    id: props.initialData?.id || "",
-    name: props.initialData?.name || "",
-    email: props.initialData?.email || "",
-    gender: props.initialData?.gender || "",
-    married: props.initialData?.married ?? false,
-    role: props.initialData?.role || "",
-  };
+  form.value = { ...initialForm };
   // emit("cancel");
   showModal.value = false;
 };
