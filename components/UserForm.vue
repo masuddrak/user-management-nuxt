@@ -9,8 +9,9 @@ import { useUserStore } from "@/stores/userStore";
 import Button from "./sheard/Button.vue";
 
 const userStore = useUserStore();
-
-const props = defineProps<{ initialData?: any }>();
+const route = useRoute();
+const router = useRouter();
+const props = defineProps<{ initialData?: any; updateModalCon?: any }>();
 const emit = defineEmits(["submit", "cancel"]);
 
 // Initialize form with initial data or empty values
@@ -23,6 +24,8 @@ const form = ref({
   role: props.initialData?.role || "",
 });
 const showModal = ref(false);
+const updateModal = ref(false);
+const newModalValue = ref(false);
 // Track changes
 const isChanged = computed(
   () => JSON.stringify(form.value) !== JSON.stringify(props.initialData)
@@ -31,6 +34,8 @@ const isChanged = computed(
 const isAnyValueTrue = computed(() =>
   Object.values(form.value).some((value) => Boolean(value))
 );
+const userId = computed(() => route.params.id);
+
 // Reset form
 watch(
   () => props.initialData,
@@ -47,16 +52,28 @@ const handleSubmit = () => {
   } else {
     userStore.addUser(form.value);
   }
+  router.push("/");
   emit("submit", form.value);
 };
 
 // Handle cancel action
 const handleCancel = () => {
-  if (isChanged.value) {
+  console.log("handleCancel", userId.value);
+  if (isChanged.value && userId.value) {
     showModal.value = true;
+    return (updateModal.value = true);
   } else {
-    resetForm();
+    if (isChanged.value) {
+      showModal.value = true;
+    }
   }
+};
+
+onMounted(() => {});
+const handleCancelModal = () => {
+  newModalValue.value = true;
+  showModal.value = true;
+  console.log("handleCancelModal", userId.value);
 };
 
 // Reset form fields to initial state
@@ -69,7 +86,7 @@ const resetForm = () => {
     married: props.initialData?.married ?? false,
     role: props.initialData?.role || "",
   };
-  emit("cancel");
+  // emit("cancel");
   showModal.value = false;
 };
 </script>
@@ -108,12 +125,29 @@ const resetForm = () => {
       :class="isAnyValueTrue ? 'flex block' : 'hidden'"
     >
       <Button v-if="isChanged" type="submit" variant="submit"> Submit </Button>
-      <Button @click.prevent="handleCancel" variant="cancel"> Cancel </Button>
+      <div :class="updateModalCon ? 'hidden' : ''">
+        <Button @click.prevent="handleCancel" variant="cancel"> Cancel </Button>
+      </div>
+      <div :class="updateModalCon ? '' : 'hidden'">
+        <Button @click.prevent="handleCancelModal" variant="cancel">
+          Cancel
+        </Button>
+      </div>
     </div>
   </form>
-
+  <div
+    v-if="newModalValue && showModal"
+    class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50"
+  >
+    <ConfirmationModal
+      v-if="showModal"
+      @confirm="resetForm"
+      @close="showModal = true"
+    />
+  </div>
   <ConfirmationModal
     v-if="showModal"
+    :updateModal="updateModal"
     @confirm="resetForm"
     @close="showModal = false"
   />
